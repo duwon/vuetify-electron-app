@@ -13,8 +13,8 @@ protocol.registerSchemesAsPrivileged([
 async function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1024,
+    height: 980,
     webPreferences: {
 
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -24,10 +24,21 @@ async function createWindow () {
     }
   })
 
+  win.removeMenu() // 메뉴제거
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     if (!process.env.IS_TEST) win.webContents.openDevTools()
+
+    // 개발모드에서 F12 키을 이용한 DevTools 토클
+    win.webContents.on('before-input-event', (event, input) => {
+      if (input.key === 'F12') {
+        console.log('Pressed F12')
+        win.webContents.toggleDevTools()
+        event.preventDefault()
+      }
+    })
   } else {
     createProtocol('app')
     // Load the index.html when not in development
